@@ -73,6 +73,7 @@ pipeline {
         stage('Docker Push') {
             steps {
                 script {
+                    echo "Pushing to DockerHub"
                     sh "docker push $IMAGE_NAME"
                 }
             }
