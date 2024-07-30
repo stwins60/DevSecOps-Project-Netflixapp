@@ -66,6 +66,7 @@ pipeline {
         stage('Trivy Image Scan') {
             steps {
                 script {
+                    echo "Scanning Image"
                     sh "trivy image $IMAGE_NAME"
                 }
             }
