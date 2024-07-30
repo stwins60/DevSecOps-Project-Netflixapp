@@ -9,6 +9,7 @@ pipeline {
         IMAGE_NAME = "${DOCKERHUB_USERNAME}/${DEPLOYMENT_NAME}:${IMAGE_TAG}"
         SCANNER_HOME = tool 'sonar-scanner'
         THE_MOVIE_DB_APIKEY = credentials('e4bc6a92-eba1-448c-ae39-bdae68277560')
+        BRANCH_NAME = "${GIT_BRANCH.split('/)[1]}"
     }
 
     stages {
@@ -75,6 +76,14 @@ pipeline {
                     sh "docker push $IMAGE_NAME"
                 }
             }
+        }
+    }
+    post {
+        success {
+            slackSend channel: '#alerts', color: 'good', message: "${currentBuild.currentResult}: \nJOB_NAME: ${env.JOB_NAME} \nBUILD_NUMBER: ${env.BUILD_NUMBER} \nBRANCH_NAME: ${env.BRANCH_NAME}. \n More Info ${env.BUILD_URL}"
+        }
+        failure {
+            slackSend channel: '#alerts', color: 'danger', message: "${currentBuild.currentResult}: \nJOB_NAME: ${env.JOB_NAME} \nBUILD_NUMBER: ${env.BUILD_NUMBER} \nBRANCH_NAME: ${env.BRANCH_NAME}. \n More Info ${env.BUILD_URL}"
         }
     }
 }
