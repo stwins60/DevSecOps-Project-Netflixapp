@@ -84,9 +84,14 @@ pipeline {
                 script {
                     dir('Kubernetes') {
                         kubeconfig(credentialsId: '3f12ff7b-93cb-4ea5-bc21-79bcf5fb1925', serverUrl: '') {
-                            sh "sed -i 's|IMAGE_NAME|${IMAGE_TAG}|g' deployment.yml"
+                            sh "sed -i 's|IMAGE_NAME|${IMAGE_NAME}|g' deployment.yml"
                             sh "kubectl apply -f ."
-                            slackSend channel: '#alerts', color: 'good', message: "DevOps Mentorship Site Deployed Successfully with image tag ${IMAGE_TAG} \n URL: https://netflix.cloudaideveloper.com/ \n More Info ${env.BUILD_URL}"
+                            def rolloutStatus = sh(script: 'kubectl rollout status deploy ${DEPLOYMENT_NAME} -n qa-namespace', returnStdout: true).trim()
+                            if (rolloutStatus != 0){
+                                slackSend channel: '#alerts', color: 'danger', message: """Deployment to Kubernetes failed. Check the logs for more information."""
+                            }else {
+                                slackSend channel: '#alerts', color: 'good', message: "Netflix app Deployed Successfully with image tag ${IMAGE_TAG} \n URL: https://netflix.cloudaideveloper.com/ \n More Info ${env.BUILD_URL}"
+                            }
                         }
                     }
                 }
