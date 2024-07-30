@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: netflix-app
+  namespace: qa-namespace
   labels:
     app: netflix-app
 spec:
@@ -14,8 +15,24 @@ spec:
       labels:
         app: netflix-app
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: custom-label
+                    operator: In
+                    values:
+                      - k8s
       containers:
       - name: netflix-app
-        image: nasi101/netflix:latest
+        image: IMAGE_NAME
         ports:
         - containerPort: 80
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"

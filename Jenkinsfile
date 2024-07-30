@@ -79,6 +79,17 @@ pipeline {
                 }
             }
         }
+        stage('Deployment') {
+            steps {
+                script {
+                    dir('Kubernetes') {
+                        sh "sed -i 's|IMAGE_NAME|${IMAGE_TAG}|g' deployment.yaml"
+                        sh "kubectl apply -f ."
+                        slackSend channel: '#alerts', color: 'good', message: "DevOps Mentorship Site Deployed Successfully with image tag ${IMAGE_TAG} \n URL: https://netflix.cloudaideveloper.com/ \n More Info ${env.BUILD_URL}"
+                    }
+                }
+            }
+        }
     }
     post {
         success {
