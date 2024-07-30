@@ -1,4 +1,3 @@
 .*
 build
 node_modules
-# This file is used to ignore files and directories in the build context
